@@ -1,0 +1,75 @@
+\levelstay{Circuit Quantization}
+So far we have discussed how circuits work from a classical perspective, and how quantum mechanics works in general. Recall that our overall goal is to make a superconducting circuit device supporting quantum operations. It is now time to look at how circuits work from a \textit{quantum} perspective. We will start from the very basic behavior of a circuit and go through a fairly involved process to eventually derive a quantum circuit Hamiltonian. Often one can skip straight to the quantum Hamiltonian, and so this work would appear unnecessary, and the reader may be tempted to skip to the results of this chapter. However, this can be a trap---introducing drives can lead to different Hamiltonians that only become apparent if one starts from the basic behavior (CITE JENS). We also note that circuit quantization is still an area of active research. In particular, researchers are still working to develop the best treatments of time-dependent fields and finite-size circuit elements (CITE YAO LU).
+
+Much of this chapter derives from excellent notes published by Devoret and Vool (CITE) and we gratefully acknowledge their work.
+
+\section{Lumped circuit quantization}
+We will begin quantizing a circuit in the simpler case where every element of the circuit is lumped. That is to say, we will completely neglect issues of distance and wavelength, and will treat every circuit element as if it has 0 size. This is of course untrue, but may be a valid enough approximation when the dimensions of an element are much less than the wavelength $\lambda$. Later we will cover how to quantize circuits with distributed elements in \cref{sec:distributedQuant}. We will also assume no time-dependent drives for the moment.
+
+Consider the circuit graph shown in (REFER TO FIGURE). One can think of this circuit as a graph (in the mathematical use of the term) where circuit elements are \textit{branches} that connect different \textit{nodes} together. Any two branches may be connected by a single effective capacitor (comprising the parallel sum of all capacitive elements on the branch) and/or by any number of inductors and Josephson junctions. In a classical circuit we will consider each node to have a single well-defined voltage and current. Note that, in reality, all nodes should be connected by some stray capacitance and inductance. We typically neglect very weak couplings so that the graph is simpler. Note that we have only included linear inductors and capacitors for now---we will cover how to deal with nonlinearity later. Note also that we have not included any resistors, as the treatment of a lossy element in quantum mechanics is always a complicated topic. (WILL WE COMMENT ON THIS LATER?)
+
+\subsection{Picking variables and defining energies}
+It turns out that instead of current and voltage, it will be better to work in terms of charge and flux. Our first classical intuition may be to define a charge at a node and a flux around a loop. It turns out that for most superconducting circuits it is instead preferable to define a \textit{node flux} at each node. To do so, first we must define a \textit{branch flux} associated with the branch between two nodes. Consider a branch between nodes $i$ and $j$, with a voltage drop across the branch $V_{ij}(t)$: 
+\begin{equation}
+    \Phi_{ij} = \int_{-\infty}^tV_{ij}(t')dt'
+\end{equation}
+where we consider all voltages to have been set to 0 at $t=-\infty$ (CHECK THIS). Likewise $V_{ij} = \dot{\Phi}_{ij}$. Note that $\Phi_{ij}$ only depends on a voltage difference, not on an absolute voltage, and so does not depend on where we choose to set $V=0$. That is to say, the branch flux is \texit{gauge invariant}. Similarly we can define a branch charge difference based on the current $I_{ij}$ through the branch:
+\begin{equation}
+    q_{ij} = \int_{-\infty}^tI_{ij}(t')dt'
+\end{equation}
+We define voltage and current to be in opposite directions, so a positive branch voltage is associated with a negative branch current and vice versa. This is because current flows in the direction of a voltage drop, i.e., in the negative direction relative to voltage. See (FIGURE). 
+%From this definition we can see that the flux across a branch between nodes $i$ and $j$ is $\Phi_{ij} = \Phi_i - \Phi_j$. We can also see that the voltage across that branch is $V_{ij} = V_i - V_j = \dot{\Phi}_i - \dot{\Phi}_j$ (where the dot indicates a time derivative).
+
+Next we choose a \textit{capacitive spanning tree} for the circuit graph. This is a subset of capacitive branches so that there is a \textit{unique} path to every node in the circuit. Equivalently, the spanning tree reaches every node but contains no loops. We don't have to worry that a node is unreachable via only capacitive branches: there is always at least a small amount of capacitance between any two objects, so if we need to add a capacitive branch to reach a node then we are free to do so. Once we have defined the spanning tree, we must choose a gauge, as the node variables we want are \textit{not} gauge invariant. This amounts to picking one node that we will call the ground node and setting its \textit{node flux} $\Phi_g = 0$. Starting with this ground node, we can move to each node in the spanning tree, adding the branch flux from each branch as we go. For instance, in the spanning tree shown in (FIGURE), we (EXAMPLE OF DEFINITION).
+
+
+
+We can define the energy of the branch elements in terms of the node fluxes. Specifically, the energy from an inductor $L_{ij}$ connecting nodes $i$ and $j$ is
+\begin{equation}
+\label{eq:Eind}
+    E_{ij}^\mathrm{ind} = \frac{(\Phi_i-\Phi_j)^2}{2L_{ij}}
+\end{equation}
+and the energy from a capacitor connecting those nodes is
+\begin{equation}
+\label{eq:Ecap}
+    E_{ij}^\mathrm{cap} = \frac{1}{2}C_{ij}V_{ij}^2 = \frac{1}{2}C_{ij}(\dot{\Phi}_i - \dot{\Phi}_j)^2
+\end{equation}
+We can write the sum of all the inductive or capacitive energies best in matrix form. Consider $\vec{\Phi}$ to be the $N\times 1$ column vector of all $N$ node fluxes. Then $\sum_{ij} E_{ij}^\mathrm{ind}$ can be written in matrix form:
+\begin{equation}
+    \label{eq:matrixEind}
+    E^\mathrm{ind} = \frac{1}{2}\vec{\Phi}^\top\mathbf{L^{-1}}\vec{\Phi}
+\end{equation}
+where $\mathbf{L^{-1}}$ is a matrix with elements $L_{ij}^{-1} = -1/L_{ij}$. If two nodes do not have an inductor linking them directly, this is the same as the limit of infinite inductance, so that matrix element is 0. The diagonal elements are defined such that each row and column sums to 0, $L_{ii}^{-1} =\sum_{j\neqi}1/L_{ij}$. Here the minus sign comes from the fact that the cross terms in the expansion of \cref{eq:Eind} are negative.
+
+\begin{exercise}
+    For the circuit shown below, define a spanning tree, define the nodes, and verify that \cref{eq:matrixEind} gives the correct sum of inductive energies.
+\end{exercise}
+
+Likewise we can define a capacitance matrix $\mathbf{\tilde{C}}$ such that $C_{ij}$ is the negative of the capacitance between nodes $i$ and $j$ and again the diagonal elements are defined to make each row and column sum to 0. Then we can write the total capacitive energy as
+\begin{equation}
+    \label{eq:matrixEcapflux}
+    E^\mathrm{cap} = \frac{1}{2}\dot{\vec{\Phi}}^\top\mathbf{C}\dot{\vec{\Phi}}
+\end{equation}
+At this point we can write the classical Lagrangian:
+\begin{equation}
+    \label{eq:Lagrangianfluxonly}
+    \mathcal{L} = \frac{1}{2}\dot{\vec{\Phi}}^\top\mathbf{C}\dot{\vec{\Phi}}-\frac{1}{2}\vec{\Phi}^\top\mathbf{L^{-1}}\vec{\Phi}
+\end{equation}
+Note that we are implicitly treating node flux $\vec{\Phi}$ as a generalized position coordinate. We could just as easily have chosen to do this with charge $q$, although instead of a capacitive spanning tree leading to a node flux we would have an inductive spanning tree leading to a loop charge. We will stick with the node flux description.
+
+\subsection{From Lagrangian to Hamiltonian}
+A small peek ahead: our goal is to find a classical Hamiltonian written in terms of canonically conjugate variables (generalized position and momentum). This will allow us to easily transform the classical Hamiltonian into a quantum one. Since node flux is our generalized position, and its generalized momentum will have units of charge, we will call our generalized momentum \textit{node charge} $\vec{q}$:
+\begin{equation}
+    q_i \equiv \frac{\partial\mathcal{L}(\vec\Phi,\dot{\vec{\Phi}})}{\partial\dot{\vec{\Phi}}} = \mathbf{C}\dot{\vec{}}
+\end{equation}
+To write the classical Hamiltonian in terms of the node flux and node charge (rather than time derivative of node flux), we use the Legendre transform:
+\begin{equation}
+    \mathcal{H}(\vec\Phi,\vec{q})= \sum
+\end{equation}
+
+\section{Quantizing a distributed mode}
+\label{sec:distributedQuant}
+\subsection{Energy participation ratio}
+\subsection{Black box quantization}
+\subsection{Lumped oscillator model}
+\subsection{}

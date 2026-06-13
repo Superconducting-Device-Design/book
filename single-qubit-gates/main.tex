@@ -1,0 +1,239 @@
+\levelstay{Single Qubit Gates}
+Recall the goal that we set at the beginning of the book: we want to design an apparatus that will achieve a particular two-qubit (2Q) unitary operation. Often to achieve such an operation we will need one or more single-qubit (1Q) operations (gates). It turns out that the most common way to perform 1Q gates on superconducting qubits is functionally identical to the way gates are performed in many other technology platforms such as cold atoms and defect spins. Therefore, as we cover 1Q gates we will keep much of the language generic. We will begin by covering the mechanism by which gates are performed, then will cover errors that can occur. We will conclude by going over a typical gate calibration procedure.
+
+\section{Gates in the qubit picture}
+It is important to remmeber that there is no such thing as a true qubit---a system with only 2 states---in nature. Even a physical spin-1/2 system such as an electron has motional degrees of freedom. However, most of quantum computing is structured around qubits, so we will begin our discussion assuming we can ignore all other states. Later we will see that this assumption is often invalid and can lead to problems, but let's not make things more complicated than they need to be at the start.
+
+\subsection{Target Hamiltonian}
+Our goal is to be able to perform a complete set of single-qubit unitaries. Such a unitary can be parametrized as $\hat{U}(\theta,\vartheta,\phi)$: a rotation of the Bloch vector by an angle $\theta$ about an axis with polar angle $\vartheta$ and azimuthal angle $\phi$. While there are many ways to generate such an operation, the most common is to combine rotations about the $x$, $y$, and $z$ axes in series. As we will see later, we can often get the $z$-axis rotations for free, so for now we will focus on $x$ and $y$ rotations. So our target gate is $\hat{R}(\theta,\phi)$, a rotation by angle $\theta$ about an axis in the $xy$ plane with azimuthal angle $\phi$. This operator can be written compactly:
+\begin{align}
+    \hat{R}(\theta,\phi) &= \cos\frac{\theta}{2} \id - i \sin\frac{\theta}{2}\left(\cos\phi \ \sx + \sin\phi \ \sy\right) \\
+    &= e^{-i \frac{\theta}{2} (\cos\phi \ \sx + \sin\phi \ \sy)}
+\end{align}
+The latter form suggests how to \textit{generate} the rotation: we want to create a Hamiltonian $\hat{H}(t)$ such that 
+\begin{equation*}
+    \mathcal{T} e^{\frac{-i}{\hbar} \int \hat{H}(t)dt}=e^{-i \frac{\theta}{2} (\cos\phi \ \sx + \sin\phi \ \sy)}
+\end{equation*}
+\footnote{Recall that $\mathcal{T}$ indicates \textit{time ordering}, i.e., doing the integral correctly if the Hamiltonian at one time does not commute with the Hamiltonian at another time. For more discussion, see REFER TO CHAPTER}. A simple solution is to just set $\hat{H}/\hbar=\frac{\Omega}{2} (\cos\phi \ \sx + \sin\phi \ \sy)$ for a gate time $t_g = \theta/\Omega$ and call it good. We will see later that more complicated time dependence is desirable, but for now we will stick with this constant Hamiltonian as our target.
+\subsection{Available Hamiltonians}
+Let us return to specifically thinking about the transmon. As we saw before in Chapter <REFER TO CHAP>, it has an effective Hamiltonian (when not driven)
+\begin{equation}
+    \hat{H}/\hbar = \omega_q \adag \hat{a} + \frac{\eta}{2}\adaga(\adaga-1)
+\end{equation}
+Adding a charge drive $V_d(t)$, as we saw before, leads to a term
+\begin{equation}
+    \hat{H}_d/\hbar = i\epsilon(t)(\adag - \hat{a})
+\end{equation}
+Flux drives can also be useful, but we will cover those later in Chapter <2Q gate chapter>. We can truncate the transmon Hamiltonian to the first two states, which leads to the equivalency 
+\begin{align}
+\label{eq:astosigs}
+1 - 2\adaga &\rightarrow \sz \\
+(\adag + \hat{a}) &\rightarrow \sx \\
+i(\adag - \hat{a}) &\rightarrow \sy
+\end{align}
+We now are left with the general form of the Hamiltonian that we can create:
+\begin{equation}
+\label{eq:qubit-drive-lf}
+    \hat{H}/\hbar = -\frac{\omega_q}{2}\sz + \epsilon(t)\sy
+\end{equation}
+This resembles the Hamiltonian we are targeting, but there are some issues caused by the extra $\sz$ term. Importantly, we are typically restricted to regimes where $|\epsilon|\ll \omega_q$, or at least where the $sz$ term is not negligible. Remember that we want a rotation of the Bloch vector about an axis in the $xy$ plane. The $\sy$ term will cause a $y$-axis rotation, but the larger $\sz$ term will cause a much faster $z$-axis rotation that will cause the $y$ rotation to largely average out---a $y$ rotation that sends the qubit towards the $\ket{1}$ state will start sending it back towards $\ket{0}$ when the $z$ rotation has put the state on the other side of the sphere. <GOOD PLACE FOR AN ANIMATION>. However, we can see a possible solution: if we can reverse the direction of the $y$ rotation in sync withe the $z$ rotation, we can keep the state moving north/south on the sphere (albeit while spiraling around the $z$ axis as well). Here we turn to techniques that were first developed for nuclear magnetic resonance.
+\begin{exercise}
+    Show that the analogies in Eq. \ref{eq:astosigns} create the proper commutation relations $[\hat{\sigma}_i,\hat{\sigma}_j]=i\epsilon_{ijk}\hat \sigma_k$
+\end{exercise}
+
+
+\subsection{The rotating frame}
+\label{sec:rotatingframe}
+Let us take Eq. \ref{eq:qubit-drive-lf} and set 
+\begin{equation}
+    \epsilon(t) = \epsilon_0 \cos \left(\omega_d t + \phi\right) = \frac{\epsilon_0}{2}\left(e^{i\left(\omega_d t + \phi\right)}+e^{-i\left(\omega_d t + \phi\right)}\right)
+\end{equation}
+Now let us transform to a frame of reference that is rotating about the $z$ axis at the drive frequency. The operator for this transformation is just a $z$-axis rotation by $\omega_d t$, i.e., 
+\begin{equation}
+    \hat{U}_\mathrm{RF} = e^{-i\frac{\omega_d}{2}t\sz} 
+\end{equation}
+We can relate the Hamiltonian in this rotating frame to the Hamiltonian in the ``lab frame'':
+\begin{equation}
+\label{eq:Hrfgeneral}
+    \hat{H}_\mathrm{RF} = \hat{U}_\mathrm{RF}^\dag \hat{H}_\mathrm{lab} \hat{U}_\mathrm{RF} + i \hbar \hat{U}_\mathrm{RF}^\dag \dot{\hat{U}}_\mathrm{RF}
+\end{equation}
+where the dot indicates a time derivative. This leads to the rotating frame Hamiltonian for our driven qubit,
+\begin{equation}
+    \label{eq:Hrfdrivenqubit}
+    \hat{H}_\mathrm{RF}/\hbar = -\frac{(\omega_q-\omega_d)}{2}\sz + e^{i\frac{\omega_d}{2}t\sz} \epsilon_0 \cos\left(\omega_d t + \phi\right) \sy e^{-i\frac{\omega_d}{2}t\sz} 
+\end{equation}
+
+Let us ignore the first term for now (i.e., set $\omega_q=\omega_d$) and focus only on the second. We can use the identity 
+\begin{equation}
+\label{eq:rotationop}
+    e^{i\frac{\theta}{2}\hat{\sigma}_j} = \cos{\frac{\theta}{2}}\id - i \sin{\frac{\theta}{2}}\hat{\sigma}_j
+\end{equation}
+to write
+\begin{align}
+    \hat{H}_\mathrm{RF} =& \left(\cos{\frac{\omega_d t}{2}}\id - i \sin{\frac{\omega_d t}{2}}\sz\right) \epsilon_0 \cos\left(\omega_d t + \phi\right) \sy \left(\cos{\frac{\omega_d t}{2}}\id + i \sin{\frac{\omega_d t}{2}}\sz\right) \notag \\ 
+    =& \ \epsilon_0\cos(\omega_d t + \phi)(\cos^2{\frac{\omega_d t}{2}} \sy + \sin^2{\frac{\omega_d t}{2}}\sz\sy\sz \notag \\
+    &+ i\cos\frac{\omega_d t}{2}\sin\frac{\omega_d t}{2}\sy\sz - i\cos\frac{\omega_d t}{2}\sin\frac{\omega_d t}{2}\sz\sy) \notag \\
+    =& \ \epsilon_0 \cos\left(\omega_d t + \phi\right)
+    \left[\left(\cos^2\frac{\omega_d t}{2} - \sin^2 \frac{\omega_d t}{2}\right)\sy- 2\cos\frac{\omega_d t}{2}\sin\frac{\omega_d t}{2} \sx\right]\notag
+\end{align}
+In this last step we have used $[\hat{\sigma}_i,\hat{\sigma}_j]=i\epsilon_{ijk}\hat \sigma_k$. The time-dependent terms in the parentheses are just double-angle formulas, and we can split up the first term using angle addition:
+\begin{align*}
+    \hat{H}_\mathrm{RF}/\hbar &= \epsilon_0\left(\cos\omega_d t\cos\phi - \sin \omega_d t \sin\phi\right)\left(\cos\omega_d t \ \sy - \sin \omega_d t \ \sx\right) \\
+    =& \ \epsilon_0 [\left(\cos^2\omega_d t \ \sy - \cos\omega_d t \sin\omega_d t \ \sx \right)\cos\phi\\
+    &+ \left(\sin^2\omega_d t \ \sx - \cos\omega_d t \sin\omega_d t \ \sy \right)\sin\phi]
+\end{align*}
+Again using double-angle formulas, we can rewrite this as
+\begin{align*}
+    \hat{H}_\mathrm{RF}/\hbar =& \frac{\epsilon_0}{2} [\cos\phi \ \sy + \sin\phi \ \sx - \left(\cos2\omega t \cos\phi + \sin2\omega t \sin \phi\right)\sy\\
+    &- \left(\cos2\omega t \sin\phi + \sin2\omega t \cos \phi\right)\sx ] 
+\end{align*}
+This is as far as we can get without taking approximations. It turns out that in this case it typically \texit{is} valid to take the rotating wave approximation. This corresponds to throwing away all the terms oscillating at $2\omega t$ because their effects will average out to something negligible. (A discussion of the validity of this approximation follows in the next section). Making the RWA, and putting back in the $\sz$ term we ignored earlier (it was along for the ride the whole time), we are left with our final result:
+\begin{equation}
+    \label{eq:RFdriveRWA}
+    \hat{H}_\mathrm{RF}/\hbar = -\frac{(\omega_q-\omega_d)}{2}\sz + \frac{\epsilon_0}{2} \left(\cos\phi \ \sy + \sin\phi \ \sx\right)
+\end{equation}
+Now we see something very interesting! Remember, $\omega_d$ and $\phi$ are both parameters that we can control with our classical electronics. The first thing that jumps out is that by setting $\omega_d \approx \omega_q$ we can eliminate the first term, so we don't have to deal with those pesky $z$-axis rotations averaging out our attempted gate. The second thing that jumps out is that the axis of the Hamiltonian in the $xy$ plane---that is, the azimuthal angle of the axis of rotation on the Bloch sphere---is just the phase of the drive $\phi$ in the lab frame. If we want a different rotation axis, we just set a different phase! As always, when dealing with phases, your next question should be ``Phase relative to what?'' We'll cover that in Section \ref{sec:virtualgates}.
+
+So finally we have the Hamiltonian that we want: an $xy$ plane Pauli with tunable strength $\epsilon$. Note that we have treated $\epsilon$ as if it was constant this whole time, but that need not be true, and in fact it will usually have some time dependence such that $\int_0^{t_g} \epsilon(t)dt=\theta$ where $\theta$ is the desired rotation angle. Likewise phase $\phi$ can be time-dependent. Typically we combine these dependencies to define two amplitudes, $\epsilon_x(t)$ and $\epsilon_y(t)$, corresponding to oscillations in the lab frame that look like $\sin\omega_d t$ and $\cos\omega_d t$, respectively. Everything that we control about the drive can be reduced to the amplitudes of those two pulses and their frequency.
+
+It is important to note that the above derivation would apply for any transition between two states that is being driven near resonance. All that is required is an oscillatory drive near the transition frequency and for that drive Hamiltonian to have a nonzero matrix element between the two states. Keeping this fact in mind is particularly important when we consider all the transitions we were \textit{not} intending to drive, which we discuss in Section \ref{sec:beyondqubitgates}.
+
+\begin{exercise}
+    Show that Eq. \ref{eq:Hrfgeneral} is true by transforming the wave function to the rotating frame, $\ket{\Psi_\mathrm{RF}} = \hat{U}_\mathrm{RF}\ket{\Psi_\mathrm{lab}}$, then explicitly finding the Hamiltonian that governs $\ket{\Psi_\mathrm{RF}}$'s time dependence.
+\end{exercise}
+
+\subsection{Validity of the rotating wave approximation}
+We have taken the rotating wave approximation here, which we previously cautioned you not to do. It is important to understand when the approximation is and is not valid. The RWA is typically stated as ``ignoring fast oscillating terms,'' but as always when we hear adjectives such as ``fast,'' we must ask \textit{compared to what?} In this case it is compared to the rate of qubit state rotation, i.e., $\epsilon$. It is valid to ignore the fast-oscillating terms when $2\omega_d t \gg \epsilon$. This is because the effect of the Hamiltonian is to determine the \textit{time derivative} of the state, and so it is only through the \textit{integral} of the Hamiltonian that we see its effects. That is, the relevant quantity is $\frac{1}{\hbar}\int\hat{H}(t)dt$. Consider a Hamiltonian like the one we have above, with an approximately constant term paired with an oscillating term of roughly equal magnitude: $\hat{H/\hbar}\approx \epsilon (1+\cos2\omega_d t)$. Then
+\begin{equation*}
+    \frac{1}{\hbar}\int_0^{t_g} \hat{H}(t)dt \approx \epsilon t_g + \frac{\epsilon}{2\omega_d}\sin 2\omega_dt_g
+\end{equation*}
+We see that the effect of the constant term grows linearly in time, while the oscillatory term gives an effect that is bounded by $\epsilon/2\omega_d$, and so never is significant when $\epsilon \ll 2\omega_d$. 
+
+It is worth asking when the RWA might not apply. The simple answer is in situations where the transition frequency is small compared to the rate at which we wish to perform rotations. This is often the case for fluxonium qubits or for transitions in coupled transmons with similar frequencies. In these cases the RWA may be taken in analytic theory to gain intuition, but all terms should be kept in numerical simulations to accurately model the dynamics.
+
+\section{Virtual $Z$ gates}
+\label{sec:virtualgates}
+As we saw in Section \ref{sec:rotatingframe}, the axis of rotation that our gate drives will depend on the choice of drive phase $\phi$ (or equivalently, the relative amplitudes of the lab-frame drives that look like $\cos\omega_d t$ vs $\sin\omega_dt$). This phase is completely arbitrary, and is equivalent to our choice of when to define $t=0$. Likewise, this means the definitions of the $x$ and $y$ axes in the rotating frame are completely arbitrary, and we could just as easily have chosen a different frame of reference. This is the mechanism by which we will perform \textit{virtual Z gates}. It is easiest to explain by working through an example.
+
+Say we want to rotate the qubit state around the $z$ axis by $\pi/8$ (a $T$ gate). If we just change our phase reference by $-\pi/8$, we have defined a new coordinate system with $x^\prime$ and $y^\prime$ axes that are rotated $-\pi/8$ relative to the original coordinate system. So in this new coordinate system, the state has reached its desired final point, as if it rotated. Of course, nothing \textit{physically} has happened to the state---how would the qubit know that we have updated our phase reference? The answer is that it cannot, \textit{until we drive our next gate}. This is because in this new coordinate system, a $y$ rotation corresponds to setting our new phase $\phi\prime = 0$, which is the same as setting the old phase $\phi = -\pi/8$. The qubit can tell the difference! It turns out that in our new coordinate system, an instantaneous virtual $z$ rotation followed by a real $xy$ rotation looks the same as a real $z$ followed by a real $xy$ in the old coordinate system. Hooray, we're done!
+
+Well, unfortunately, not quite. There are other qubits, and depending on our 2-qubit gate scheme, those qubits may need to know about the phase reference on this qubit. So we'll update their phase references accordingly, which solves that problem, but there's a bigger issue. The \textit{environment} has no way of knowing that we have done a virtual $z$ rotation. If our gates are supposed to affect the way the qubit interacts with the environment---for instance, if we're driving a dynamical decoupling scheme---then we have to do our virtual $Z$ in such a way that the intent of the gate scheme is preserved. In practice this typically means avoiding $Z$ gates in DD sequences. It also means that if a DD sequence calls for $X$ and $Y$ gates, these must be physical $X$ and $Y$ gates. For instance, it is not sufficient use the identity $ZX = Y$ with a virtual $Z$ gate, because the environment does not know that this gate has happened---all your $Y$ gates just get replaced by $-X$ gates and you end up with the wrong DD sequence.
+%and ensuring that $X$ and $Y$ gates are rotations around truly perpendicular axes (rather than around axes that have been updated to be perpendicular with a virtual rotation). 
+For a more detailed discussion, see REFER TO VZ PAPER.
+
+
+\section{Gate fidelity}
+So far we have discussed perfectly-calibrated gates performed on a true two-level system that does not interact with its environment. We may as well have wished for a magic pony. Real systems may be miscalibrated, there are always more than two states, and the environment is always interacting with the system. The exact physical causes of these errors depend on the system, and we will discuss many of them in further chapters. For now we will discuss errors based on the symptoms they cause.
+
+Before we can properly discuss gate error we need a way to quantify it. This is a more complicated task than it may seem. To do it properly we need to formalize what a quantum gate really is.
+
+\subsection{Quantum maps}
+We will treat the gate as a \textit{quantum map}, which takes in a quantum state in the form of a density operator and returns another quantum state. This is more general than the unitary transformation we discussed earlier, as the map may not be unitary (i.e., it may include decoherence). Anything that happens to our system can be represented as a quantum map. The most general way to write a quantum map $\mathcal{G}$ in a Hilbert space $\bm{\mathcal{H}}$ with dimension $d$ is
+\begin{equation}
+    \mathcal{G}(\rho) = \sum_{m,n=0}^{d^2-1}\chi_{mn}\hat{E}_m^\dag \hat{\rho} \hat{E_n}
+\end{equation}
+where the $\{\hat{E_i}\}$ form an orthogonal operator basis for $\bm{\mathcal{H}}$---that is, we can write any operator in $\bm{\mathcal{H}}$ as a linear combination of $\{\hat{E_i}\}$,
+\begin{equation}
+    \hat{Q} = \sum_{i=0}^{d^2-1}Q_i \hat{E}_i \ \ \  \forall \hat{Q} \in\bm{\mathcal{H}}
+\end{equation}
+and $\mathrm{Tr(\hat{E}_m\hat{E}_n)} = d\delta_{mn}$. 
+
+The \textit{process matrix} $\bm{\chi}$ formed by the $\chi_{mn}$ completely determines the map (so long as we know the basis in which $\bm{\chi}$ was written). We will leave aside all the general properties of quantum maps and how to use them, which has been covered well in REFER TO LIDAR NOTES. We will simply say that could be at worst $d^4$ independent complex components of $\bm{\chi}$, but it turns out that $\bm{\chi}$ is Hermitian, so it can be specified with $d^4$ real numbers. \footnote{Often it is assumed that the map is trace-preserving, so only $d^4-d^2$ numbers are needed. However, this does not account for leakage out of the qubit subspace, which can be significant.} Note that this is a pretty bad scaling: for $n$ qubits we need to specify $(2^n)^4 = 16^n$ real numbers.
+
+The intent of our gate is to implement the map $\mathcal{U}(\hat{\rho}) = \hat{U}^\dag \hat{\rho} \hat{U}$, i.e., the desired unitary transform. However, instead our map is combined with some error map $\mathcal{E}$, and what we actually implement is $\mathcal{G} = \mathcal{E} \circ\mathcal{U}$. We can then characterize our gate by comparing the actual process matrix $\bm{\chi^\prime}$ (corresponding to $\mathcal{G}$ with the intended process matrix $\bm{\chi}$ and using our favorite measure of the distance between them. A common definition of process fidelity is to use the trace distance:
+\begin{equation}
+    \mathcal{F}_\mathrm{proc} \equiv \mathrm{Tr}(\bm{\chi}^\dag \bm{\chi^\prime})
+\end{equation}
+(this assumes the matrices are normalized; if not, one should first normalize by dividing each by its trace, $\bm{\chi}\rightarrow\bm{\chi}/\mathrm{Tr}(\bm{\chi})$). 
+
+
+\subsection{Incoherent error}
+\textit{Incoherent errors} are errors which are random and not repeatable. Formally, an incoherent error is not a unitary operation. They may be due to random noise in control lines or interaction with an uncontrolled environment.\footnote{Nominally these are the same thing---at some level the world is always quantum and anything that interacts with our qubit can be described as a quantum system. However, this is veering dangerously close to quantum foundations. In practice it often makes things easier to separate out ``classical noise,'' which can be written as Hamiltonian terms acting on the qubit with noisy amplitudes, from ``interactions with a quantum bath'' which is the subject of open quantum systems, i.e, beyond the scope of this book. We will keep things simple}. Incoherent errors are typically characterized by their effect on the qubit. \textit{Dephasing} errors are those errors that scramble the phase of a superposition, i.e., that change a superposition into a statistic mixture. \textit{Relaxation} errors typically refer to emission of energy as a system relaxes to a lower energy state (often the ground state), although sometimes the term refers to relaxation to a thermal equilibrium which may also involve \textit{spurious excitation}.\footnote{If you're an open systems theorist, you may know these errors as \textit{amplitude damping}, but we will keep the language more commonly used in experiment.} Finally, \textit{leakage} errors are errors where the ``qubit'' state leaves the subspace we are calling a qubit and enters some other state. In transmons this typically means excitation beyond the first excited state, although what is considered ``qubit'' vs ``leakage'' depends on how you choose to encode your information. (Note that leakage errors may not be incoherent---more discussion below.)
+
+\textit{Erasure} errors are a special type of leakage error where the qubit information is completely destroyed---that is, there is no way to map back from the leaked state to the original qubit state. Typically we refer to erasure errors that are detectable as erasures---we \textit{know} the qubit has left the logical space, no mystery about where the error occurred. It turns out that this can make quantum error correction easier, since there is no need to figure out which qubit had the error. For more discussion, see REFER TO SOMETHING.
+
+Incoherent error typically scales linearly with the length of the gate---the longer the qubit is exposed to noise, the more likely it is to have an error. Suppressing incoherent error means either reducing decoherence (reducing noise or suppressing bath couplings) or speeding up the gate. The exception to this is leakage errors, which may be induced by stronger drives. We'll show an example of this (in a coherent leakage setting) below.
+
+\subsection{Coherent error: rotation}
+\textit{Coherent} errors are errors which are repeatable and deterministic, but are not the correct operation. A coherent error is a unitary operations, but it is the \textit{wrong} operation. A simple example is an over- or under-rotation of the qubit state. That is, we intend to perform an $\hat{U}(\theta,\vartheta,\phi)$ gate (a rotation by angle $\theta$ about an axis with polar and azimuthal angles $\vartheta,\phi$), but instead rotate by $\theta +\delta\theta$. This type of error typically occurs because the microwave power for the gate is miscalibrated, either because of initial miscalibration, a drift in the power (usually due to a slow drift of an amplifier's gain or another component's attenuation), or a change in the drive Hamiltonian matrix element corresponding to the transition (this is unlikely in transmons but can occur quite naturally in, e.g., fluxonium, due to noise in bias flux). It is useful to form a Hamiltonian model of the error: 
+
+Consider a gate performed by driving a square pulse of amplitude $\epsilon$ on resonance with the qubit for a time $t_g$. In the rotating frame and making the RWA, this gives Hamiltonian
+\begin{equation*}
+    \hat{H}/\hbar = \frac{\epsilon}{2} \sx
+\end{equation*}
+where we have set the rotation axis to be the $x$ axis without loss of generality (it could be anywhere in the $xy$ plane). A rotation error can arise because of improper drive amplitude,
+\begin{equation}
+    \hat{H}/\hbar =\frac{1}{2} (\epsilon + \delta\epsilon)\sx
+\end{equation}
+giving rise to a rotation error $\delta\theta=\delta\epsilon t_g$. Now typically the pulse will have a more complicated shape, so we must replace $\epsilon\rightarrow\epsilon (t)$. However, it turns out that the drive amplitude error is almost always proportional to the drive amplitude, as it typically arises from a change in amplification/attenuation. We can therefore make the definition $\delta_\epsilon \equiv \delta\epsilon(t)/\epsilon(t)$ and assume $\delta_\epsilon$ is constant, leading to the Hamiltonian
+\begin{equation}
+    \hat{H} = \epsilon(t)(1+\delta_\epsilon)\sx
+\end{equation}
+Then regardless of the shape of $\epsilon(t)$, we find a fractional rotation error $\delta\theta/\theta = \delta_\epsilon$.
+
+
+\subsection{A digression on coherent and incoherent errors}
+Writing the gate like this, it is clear that a repetition of the gate will lead to an increase in error---repeating the gate is equivalent to doing the rotation again, so a rotation of $\theta + \delta\theta$ becomes $\2\theta + 2\delta\theta$, and for $n$ repetitions, the error becomes $n\delta\theta$. This shows the harm of coherent errors: they add coherently! That is to say, an incoherent error causes a random effect, and so in the limit of small error, $n$ incoherent errors cause an error roughly $\sqrt{n}$ times larger. Coherent errors cause the same effect every time, and so cause an error $n$ times larger, a quadratic enhancement of error. It turns out that the square of the error angle is often more important, so we have $n$ (incoherent) vs $n^2$ (coherent) error scaling. We can see this as due to the shape of the state evolution: incoherent error causes an exponential decay to another state, which in the limit of small error looks linear. Coherent error causes a sinusoidal \textit{rotation} to another state, which in the limit of small error looks quadratic.
+
+This buildup of coherent error is a major issue for many algorithms and especially for dynamical decoupling where gates are often repeated. Furthermore, gate characterization techniques like randomized benchmarking (RB) and cross-entropy benchmarking (XEB) deliberately transform coherent errors into incoherent ones by deliberate randomization of gates. This can cause them to overestimate the actual usefulness of a gate, as the fidelity reported may not be a good indication of the gate's performance. QPT is a complete characterization of the gate, but can be difficult to interpret and requires a lot of measurements. As we said earlier, gate characterization is a challenge!
+
+Often there is a tradeoff between incoherent errors and coherent errors in the gate design and calibration. Driving harder can achieve a faster gate, reducing incoherent error, but can cause more coherent error (as we will see below). Careful pulse shaping can create \textit{robust} gates that have low coherent error even when calibration parameters are not ideal, but this comes at the expense of a slower gate which is thus more vulnerable to decoherence. It is crucial to be aware of these tradeoffs when calibrating a gate.
+
+\subsection{Coherent error: phase}
+Let us return to the model from before, but now assume that our drive frequency (and the frequency of our frame of reference) is slightly detuned from the qubit frequency by an amount $\Delta \equiv \omega_d-\omega_q$:
+\begin{equation}
+    \label{eq:errorHam}
+    \hat{H}/\hbar = -\frac{\Delta}{2}\sz + \frac{1}{2}(\epsilon + \delta\epsilon)\sx
+\end{equation}
+This may be a real detuning or an effective detuning due to higher levels (see \cref{sec:qutritPhaseError} below). In this case the \emph{axis} of rotation caused by the gate has tilted by an angle $\delta\phi(t)\equiv \Delta/\epsilon(t)$. This is called a \textit{phase error} because in the limit of small angle it looks like small $z$ rotation (phase) in addition to the intended gate. Repeating the gate does not cause this error to accumulate: assuming $\Delta\ll\epsilon$, the rotation angle $\theta$ is still approximately correct, and repeating the gate will eventually cause the rotation to be $2\pi$. A $2\pi$ rotation about any axis is $-\id$, so the fact that the axis is misaligned does not cause the error to accumulate. On the other hand, repeating the gate followed by its inverse (i.e. setting $\epsilon\rightarrow-\epsilon$) \textit{does} cause the error to accumulate. This is because the axis tilt relative to the $x$ axis is reversed, and this change of axis prevents the errors from canceling out.
+% \begin{equation*}
+%     \hat{U}\approx \hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)\hat{R}_x\left(\epsilon t_g\right)\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)
+% \end{equation*}
+% Now it's interesting to examine what happens when we repeat the gate. Let's take the special case $\theta = \epsilon t_g=\pi$, i.e., an $X$ gate ($\hat{X}\equiv \hat{R}_x(\pi)=-i\sx$. Repeating the gate gives:
+% \begin{align*}
+%     \hat{U}&\approx \left[\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)\hat{X}\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)\right]^2 \\
+%     &= \hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)\hat{X}\hat{R}_z\left(\frac{-4\Delta t_g}{\pi}\right) \hat{X}\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right) \\
+%     &= -\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right) \hat{R}_z\left(\frac{4\Delta t_g}{\pi}\right) \hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right) \\
+%     &= -\id
+% \end{align*}
+% The error disappears completely! On the other hand, what if our second operation was an $\bar{X}$ gate (a rotation by $-\pi$ about the $x$ axis)? This is equivalent to changing $\epsilon \rightarrow -\epsilon$ in the Hamiltonian. Then we would have:
+% \begin{align*}
+%     \hat{U}&\approx \hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)\hat{\bar{X}}\hat{R}_z\left(\frac{-4\Delta t_g}{\pi}\right) \hat{X}\hat{R}_z\left(\frac{-2\Delta t_g}{\pi}\right)
+%\end{align*}
+%ELF NOTE: this section needs work, I got lost in the derivations
+
+\section{Gates beyond the qubit picture}\label{sec:beyondqubitgates}
+So far we have treated the system as a qubit. But any real physical system has other levels (even a true spin-1/2 has motional degrees of freedom). In particular, a transmon has higher levels with transition frequencies that are only a few percent detuned from the qubit transition. A complete accurate treatment of how these higher levels affect the qubit would require taking all of them into account, and indeed we will do that in REFER TO READOUT CHAPTER. However, to capture the qualitative effect on gates, it is sufficient to treat the transmon as a qu\textit{trit}, a 3-level system. Returning to our description of an $x$ drive of strength $\epsilon$ in the rotating frame with detuning $\Delta$, we can write the Hamiltonian in the undriven energy eigenbasis:
+\begin{equation*}
+    \hat{H}/\hbar = \frac{1}{2}\begin{pmatrix}
+        -\Delta & \epsilon & 0 \\ 
+        \epsilon & \Delta & \lambda\epsilon \\
+        0 & \lambda \epsilon & 2 \Delta + \eta
+    \end{pmatrix}
+\end{equation*}
+Here $\lambda \equiv \frac{\bra{1}\hat{n}\ket{2}}{\bra{0}\hat{n}\ket{1}}$ is the relative strength of the drive matrix element on the higher transition compared to the qubit transition. For a harmonic oscillator $\lambda = \sqrt{2}$, while for a transmon $\lambda\approx\sqrt{2}(1+\eta/2\omega_q)$ (CHECK THIS SIGN).
+
+\subsection{Phase errors}
+\label{sec:qutritPhaseError}
+Let's set $\Delta = 0$ for the moment and consider only the bottom right block of this matrix. If we diagonalize and expand to second order in $\epsilon/\eta$, we find new energies $-\lambda^2\epsilon^2/\eta$, $\eta + \lambda^2\epsilon^2/\eta$. Truncating back to looking only at the qubit states (the top right block) we have:
+\begin{equation*}
+    \hat{H}/\hbar = \frac{1}{2}\begin{pmatrix}
+        0 & \epsilon \\ 
+        \epsilon & -\lambda^2\epsilon^2/\eta
+    \end{pmatrix}
+\end{equation*}
+If we're willing to accept the somewhat sloppy math above, we see that the drive causes the qubit excited state to shift in energy by $-\lambda^2\epsilon^2/\eta$. This is the \textit{AC Stark} shift, which will turn out to be a useful way to shift transition frequencies. It is a manifestation of the fact that if a transition is driven far off resonance, the state will not rotate very far, but the eigenenergies are still affected by the drive. That is to say, the eigenenergies of the Hamiltonian $\hat{H}/\hbar=-\eta\sz/2 +\epsilon\sx/2$ depend on $\epsilon$ even when $\epsilon \ll \eta$. 
+
+So the presence of other transitions has shifted the effective qubit transition frequency when it is driven. Now we're not driving on resonance, and we will get a phase error! The solution is to change the qubit drive frequency slightly, although since the AC Stark shift will depend on the instantaneous drive amplitude, ideally the drive frequency will also be a function of time. In practice it is usually sufficient to set a slight constant drive detuning.
+
+
+\subsection{Leakage errors}
+The transmon may be driven to this higher excited state, ``leaking'' out of the qubit manifold. There are two mechanisms for this, and we must consider both of them. The first is that we always need to turn our drive on and off. This gives the pulse some spectral bandwidth---we are no longer driving a single frequency. For instance, a Gaussian pulse with width $\tau$ gives a Gaussian distribution of frequency components with width $1/\tau$ (CHECK FACTORS OF 2). Since the transmon anharmonicity is only $\sim -100$ MHz, this means that any gate faster than $100$ ns will have significant frequency components at the transmon's next transition frequency $\omega_{12}$. There is a simple solution to this, which is just to take the qubit drive pulse, remove the frequency components near $\omega_{12}$, then rescale to account for the reduced amplitude. Indeed, this is often the (incorrect!) explanation for what DRAG gates do to eliminate leakage, which we discuss below. Unfortunately, eliminating these frequency components does not solve the issue completely.
+
+The second leakage mechanism is more simple. To avoid driving the $\ket{1}\leftrightarrow\ket{2}$ transition, we relied on it being far off resonance from our drive. Hopefully your physicist senses tingled when you saw a qualitative descriptor like ``far,'' and you asked ``far compared to what?'' Well, it turns out that it needs to be far compared to the pulse bandwidth (as covered above), \textit{and} compared to the Rabi frequency. Recall that when driving a transition at a rate $\Omega$ while detuned by an amount $\eta$ (i.e., the anharmonicity), the maximum probability of the transition is $\Omega^2/(\Omega^2+\eta^2)$. If $\Omega\approx |\eta|$ then the transition probability is $\sim 1/2$, a massive error!
+
+It turns out that since we almost always want to do rotations of $\sim\pi$, the pulse bandwidth and the Rabi frequency are of equal order of magnitude. Therefore, the two effects need to be considered and combated together. The good news is that we know it is possible, at least if we only consider leakage as a coherent effect. We did this implicitly above when we discussed driving the unwanted transition, treating it as leading to a coherent quantum state. Given this, and given the fact that we have complete control over our Hamiltonian (within the constraints of our control electronics), we know we can fix leakage! If we can create an arbitrary Hamiltonian, then we can create an arbitrary unitary, such that we can ensure the state never leaves the qubit space. 
+
+\subsection{DRAG gates}
+
+\label{sec:DRAG}
