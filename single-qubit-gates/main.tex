@@ -87,7 +87,7 @@ Again using double-angle formulas, we can rewrite this as
     \hat{H}_\mathrm{RF}/\hbar =& \frac{\epsilon_0}{2} [\cos\phi \ \sy + \sin\phi \ \sx - \left(\cos2\omega t \cos\phi + \sin2\omega t \sin \phi\right)\sy\\
     &- \left(\cos2\omega t \sin\phi + \sin2\omega t \cos \phi\right)\sx ] 
 \end{align*}
-This is as far as we can get without taking approximations. It turns out that in this case it typically \texit{is} valid to take the rotating wave approximation. This corresponds to throwing away all the terms oscillating at $2\omega t$ because their effects will average out to something negligible. (A discussion of the validity of this approximation follows in the next section). Making the RWA, and putting back in the $\sz$ term we ignored earlier (it was along for the ride the whole time), we are left with our final result:
+This is as far as we can get without taking approximations. It turns out that in this case it typically \textit{is} valid to take the rotating wave approximation. This corresponds to throwing away all the terms oscillating at $2\omega t$ because their effects will average out to something negligible. (A discussion of the validity of this approximation follows in the next section). Making the RWA, and putting back in the $\sz$ term we ignored earlier (it was along for the ride the whole time), we are left with our final result:
 \begin{equation}
     \label{eq:RFdriveRWA}
     \hat{H}_\mathrm{RF}/\hbar = -\frac{(\omega_q-\omega_d)}{2}\sz + \frac{\epsilon_0}{2} \left(\cos\phi \ \sy + \sin\phi \ \sx\right)
@@ -169,11 +169,17 @@ giving rise to a rotation error $\delta\theta=\delta\epsilon t_g$. Now typically
 \begin{equation}
     \hat{H} = \epsilon(t)(1+\delta_\epsilon)\sx
 \end{equation}
-Then regardless of the shape of $\epsilon(t)$, we find a fractional rotation error $\delta\theta/\theta = \delta_\epsilon$.
+Then regardless of the shape of $\epsilon(t)$, we find a fractional rotation error $\delta\theta / \theta = \delta_\epsilon$.
 
 
 \subsection{A digression on coherent and incoherent errors}
-Writing the gate like this, it is clear that a repetition of the gate will lead to an increase in error---repeating the gate is equivalent to doing the rotation again, so a rotation of $\theta + \delta\theta$ becomes $\2\theta + 2\delta\theta$, and for $n$ repetitions, the error becomes $n\delta\theta$. This shows the harm of coherent errors: they add coherently! That is to say, an incoherent error causes a random effect, and so in the limit of small error, $n$ incoherent errors cause an error roughly $\sqrt{n}$ times larger. Coherent errors cause the same effect every time, and so cause an error $n$ times larger, a quadratic enhancement of error. It turns out that the square of the error angle is often more important, so we have $n$ (incoherent) vs $n^2$ (coherent) error scaling. We can see this as due to the shape of the state evolution: incoherent error causes an exponential decay to another state, which in the limit of small error looks linear. Coherent error causes a sinusoidal \textit{rotation} to another state, which in the limit of small error looks quadratic.
+Writing the gate like this, it is clear that a repetition of the gate will lead to an increase in error; repeating the gate is equivalent to doing the rotation again, so a rotation of $\theta + \delta \theta$ becomes $2 \theta + 2\delta\theta$, and for $n$ repetitions, the error becomes $n \delta \theta$.
+This shows the harm of coherent errors: they add coherently!
+That is to say, an incoherent error causes a random effect, and so in the limit of small error, $n$ incoherent errors cause an error roughly $\sqrt{n}$ times larger.
+Coherent errors cause the same effect every time, and so cause an error $n$ times larger, a quadratic enhancement of error.
+It turns out that the square of the error angle is often more important, so we have $n$ (incoherent) vs $n^2$ (coherent) error scaling.
+We can see this as due to the shape of the state evolution: incoherent error causes an exponential decay to another state, which in the limit of small error looks linear.
+Coherent error causes a sinusoidal \textit{rotation} to another state, which in the limit of small error looks quadratic.
 
 This buildup of coherent error is a major issue for many algorithms and especially for dynamical decoupling where gates are often repeated. Furthermore, gate characterization techniques like randomized benchmarking (RB) and cross-entropy benchmarking (XEB) deliberately transform coherent errors into incoherent ones by deliberate randomization of gates. This can cause them to overestimate the actual usefulness of a gate, as the fidelity reported may not be a good indication of the gate's performance. QPT is a complete characterization of the gate, but can be difficult to interpret and requires a lot of measurements. As we said earlier, gate characterization is a challenge!
 

@@ -13,7 +13,7 @@ It turns out that instead of current and voltage, it will be better to work in t
 \begin{equation}
     \Phi_{ij} = \int_{-\infty}^tV_{ij}(t')dt'
 \end{equation}
-where we consider all voltages to have been set to 0 at $t=-\infty$ (CHECK THIS). Likewise $V_{ij} = \dot{\Phi}_{ij}$. Note that $\Phi_{ij}$ only depends on a voltage difference, not on an absolute voltage, and so does not depend on where we choose to set $V=0$. That is to say, the branch flux is \texit{gauge invariant}. Similarly we can define a branch charge difference based on the current $I_{ij}$ through the branch:
+where we consider all voltages to have been set to 0 at $t=-\infty$ (CHECK THIS). Likewise $V_{ij} = \dot{\Phi}_{ij}$. Note that $\Phi_{ij}$ only depends on a voltage difference, not on an absolute voltage, and so does not depend on where we choose to set $V=0$. That is to say, the branch flux is \textit{gauge invariant}. Similarly we can define a branch charge difference based on the current $I_{ij}$ through the branch:
 \begin{equation}
     q_{ij} = \int_{-\infty}^tI_{ij}(t')dt'
 \end{equation}
@@ -46,7 +46,7 @@ where $\mathbf{L^{-1}}$ is a matrix with elements $L_{ij}^{-1} = -1/L_{ij}$. If 
 \end{exercise}
 
 
-Likewise we can define a capacitance matrix $\mathbf{\tilde{C}}$ such that $\tilde{C}_{ij}$ is the negative of the capacitance between nodes $i$ and $j$ and again the diagonal elements are defined to make each row and column sum to 0. In order to ensure the eventual capacitance matrix is invertible, we will now delete the row and column corresponding to the ground node ($i=0$), leading to the $N\timesN$ matrix $\mathbf{C^\prime}$. Now the diagonal is the negative of the sum of the row (or column) plus the direct capacitance of that node to ground. Then we can write the total capacitive energy as
+Likewise we can define a capacitance matrix $\mathbf{\tilde{C}}$ such that $\tilde{C}_{ij}$ is the negative of the capacitance between nodes $i$ and $j$ and again the diagonal elements are defined to make each row and column sum to 0. In order to ensure the eventual capacitance matrix is invertible, we will now delete the row and column corresponding to the ground node ($i=0$), leading to the $N \times N$ matrix $\mathbf{C^\prime}$. Now the diagonal is the negative of the sum of the row (or column) plus the direct capacitance of that node to ground. Then we can write the total capacitive energy as
 \begin{equation}
     \label{eq:matrixEcapflux}
     E^\mathrm{cap} = \frac{1}{2}\dot{\vec{\Phi}}^\top\mathbf{C}\dot{\vec{\Phi}}
