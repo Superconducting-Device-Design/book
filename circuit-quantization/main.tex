@@ -34,18 +34,19 @@ and the energy from a capacitor connecting those nodes is
 \label{eq:Ecap}
     E_{ij}^\mathrm{cap} = \frac{1}{2}C_{ij}V_{ij}^2 = \frac{1}{2}C_{ij}(\dot{\Phi}_i - \dot{\Phi}_j)^2
 \end{equation}
-We can write the sum of all the inductive or capacitive energies best in matrix form. Consider $\vec{\Phi}$ to be the $N\times 1$ column vector of all $N$ node fluxes. Then $\sum_{ij} E_{ij}^\mathrm{ind}$ can be written in matrix form:
+We can write the sum of all the inductive or capacitive energies best in matrix form. Consider $\vec{\Phi}$ to be the $N+1\times 1$ column vector of all $N+1$ node fluxes (numbered from 0 to $N$). Then $\sum_{ij} E_{ij}^\mathrm{ind}$ can be written in matrix form:
 \begin{equation}
     \label{eq:matrixEind}
     E^\mathrm{ind} = \frac{1}{2}\vec{\Phi}^\top\mathbf{L^{-1}}\vec{\Phi}
 \end{equation}
-where $\mathbf{L^{-1}}$ is a matrix with elements $L_{ij}^{-1} = -1/L_{ij}$. If two nodes do not have an inductor linking them directly, this is the same as the limit of infinite inductance, so that matrix element is 0. The diagonal elements are defined such that each row and column sums to 0, $L_{ii}^{-1} =\sum_{j\neqi}1/L_{ij}$. Here the minus sign comes from the fact that the cross terms in the expansion of \cref{eq:Eind} are negative.
+where $\mathbf{L^{-1}}$ is a matrix with elements $L_{ij}^{-1} = -1/L_{ij}$. If two nodes do not have an inductor linking them directly, this is the same as the limit of infinite inductance, so that matrix element is 0. The diagonal elements are defined such that each row and column sums to 0, $L_{ii}^{-1} =\sum_{j\neq i}1/L_{ij}$. Here the minus sign comes from the fact that the cross terms in the expansion of \cref{eq:Eind} are negative.
 
 \begin{exercise}
     For the circuit shown below, define a spanning tree, define the nodes, and verify that \cref{eq:matrixEind} gives the correct sum of inductive energies.
 \end{exercise}
 
-Likewise we can define a capacitance matrix $\mathbf{\tilde{C}}$ such that $C_{ij}$ is the negative of the capacitance between nodes $i$ and $j$ and again the diagonal elements are defined to make each row and column sum to 0. Then we can write the total capacitive energy as
+
+Likewise we can define a capacitance matrix $\mathbf{\tilde{C}}$ such that $\tilde{C}_{ij}$ is the negative of the capacitance between nodes $i$ and $j$ and again the diagonal elements are defined to make each row and column sum to 0. In order to ensure the eventual capacitance matrix is invertible, we will now delete the row and column corresponding to the ground node ($i=0$), leading to the $N\timesN$ matrix $\mathbf{C^\prime}$. Now the diagonal is the negative of the sum of the row (or column) plus the direct capacitance of that node to ground. Then we can write the total capacitive energy as
 \begin{equation}
     \label{eq:matrixEcapflux}
     E^\mathrm{cap} = \frac{1}{2}\dot{\vec{\Phi}}^\top\mathbf{C}\dot{\vec{\Phi}}
@@ -59,13 +60,38 @@ Note that we are implicitly treating node flux $\vec{\Phi}$ as a generalized pos
 
 \subsection{From Lagrangian to Hamiltonian}
 A small peek ahead: our goal is to find a classical Hamiltonian written in terms of canonically conjugate variables (generalized position and momentum). This will allow us to easily transform the classical Hamiltonian into a quantum one. Since node flux is our generalized position, and its generalized momentum will have units of charge, we will call our generalized momentum \textit{node charge} $\vec{q}$:
+\begin{align}
+    q_i &\equiv \frac{\partial\mathcal{L}(\vec\Phi,\dot{\vec{\Phi}})}{\partial\dot{\Phi_i}} \\
+    &=C_{ii}\dot{\Phi}_i+\sum_{j\neq i}^N C_{ij}(\dot{\Phi}_i-\dot{\Phi}_j)
+\end{align}
+Since $C^\prime_{ij} = C^\prime_{ji}=-C_{ij}$, we can write this more compactly:
 \begin{equation}
-    q_i \equiv \frac{\partial\mathcal{L}(\vec\Phi,\dot{\vec{\Phi}})}{\partial\dot{\vec{\Phi}}} = \mathbf{C}\dot{\vec{}}
+    \vec{q}=\mathbf{C^\prime}\dot{\vec{\Phi}}
 \end{equation}
+This relation is invertible since we earlier guaranteed $\mathbf{C^\prime}$ was invertible:
+\begin{equation}
+    \dot{\vec{\Phi}}= \mathbf{C^\prime}^{-1}\vec{q}
+\end{equation}
+
+\begin{exercise}
+    Show that $\vec{\nabla}_{\dot{\vec{\Phi}}}\mathcal{L}(\vec\Phi,\dot{\vec{\Phi}}) = \mathbf{C^\prime}\dot{\vec{\Phi}}$
+\end{exercise}
+
 To write the classical Hamiltonian in terms of the node flux and node charge (rather than time derivative of node flux), we use the Legendre transform:
 \begin{equation}
-    \mathcal{H}(\vec\Phi,\vec{q})= \sum
+    \mathcal{H}(\vec\Phi,\vec{q})= \dot{\vec{\Phi}}^\top \vec{q}-\mathcal{L}
 \end{equation}
+This leads to the classical Hamiltonian written in terms of the node fluxes and charges:
+\begin{equation}
+    \mathcal{H}(\vec\Phi,\vec{q}) = \frac{1}{2}\vec{q}^\top\mathbf{C^{\prime-1}}\vec{q} + \frac{1}{2}\vec{\Phi}^\top\mathbf{L^{-1}}\vec{\Phi}
+\end{equation}
+Now something very important has taken place: we have written the circuit Hamiltonian in terms of coordinates that are \textit{canonically conugate}. If we now promote the coordinates to operators to write the quantum Hamiltonian, we guarantee that the operators are now canonically conjugate:
+\begin{align}
+\hat{H} &= \frac{1}{2}\mathbf{\hat{q}}^\top\mathbf{C^{\prime-1}}\mathbf{\hat{q}} + \frac{1}{2}\mathbf{\hat{\Phi}}^\top\mathbf{L^{-1}}\mathbf{\hat{\Phi}} \\
+\left[\hat{\Phi}_j,\hat{q}_k\right] = i\hbar\delta_{jk}
+\end{align}
+
+\subsection{}
 
 \section{Quantizing a distributed mode}
 \label{sec:distributedQuant}
