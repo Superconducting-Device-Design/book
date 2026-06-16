@@ -4,3 +4,12 @@
 *.out
 *.toc
 main.xsim
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.run.xml
+*.synctex.gz
+*.lof
+*.lot
