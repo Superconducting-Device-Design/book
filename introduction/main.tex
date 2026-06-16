@@ -1,27 +1,67 @@
 \levelstay{Introduction}
-The goal of this book is to take the reader from someone who has some knowledge of basic physics to someone who has a decent grasp of how to design, control, and measure superconducting quantum devices. This is an attempt to collect, verify, and formalize the knowledge that has been passed down within research groups. Almost every topic covered in this book has already been covered in some other review article, thesis, summer school note, or lecture---our goal is to put it all in one place and phrase it all from the perspective of an experimentalist who has to actually build an operate a device.
 
-The target audience for this book is a graduate student or postdoc in physics or electrical engineering who has no specific knowledge of superconducting devices. It is likely that many readers will already know a lot of the material in some chapters. We encourage those readers to go through those chapters nonetheless, because the chapters rely heavily on each other and the specific approach we take matters. For instance, almost every student who has taken a quantum mechanics class has covered the quantum harmonic oscillator, but we use it to introduce tools and concepts that will be useful later. Remember, the end goal is to understand superconducting devices.
+The goal of this book is to take the reader from some knowledge of basic physics to design, control, and measurement of superconducting quantum devices.
+This is an attempt to collect, verify, and formalize the knowledge that has been passed down within research groups.
+Almost every topic covered in this book has already been covered in some other review article, thesis, summer school note, or lecture; our goal is to put it all in one place and phrase it all from the perspective of an experimentalist who has to actually build an operate a device.
 
-\section{Format of the book}
-This book is somewhat unique, in that it is being written and maintained as an open-source project. Our motivation for this is twofold. First, by allowing vetted community contributions to the text, we can ensure that we have expert writers covering the wide range of topics necessary. Second, superconducting quantum information is a fast-developing field, and what is best practice or settled knowledge now may be outdated soon. We aim for this book to be a living document, updated and maintained continually as new discoveries are made in the field. The version control and community contribution model of open-source software is ideal for such a project, and so we adopt it. Those who wish to contribute can fork the book repo (ADD LINK), make their additions or edits, then submit a pull request. Of course, those who wish to engage with this book as a traditional textbook are free to do so---just download the PDF!
+The target audience for this book is a graduate student or postdoc in physics or electrical engineering who has no specific knowledge of superconducting devices.
+Readers may already know the material in some chapters.
+We encourage those readers to go through those chapters nonetheless, because the chapters rely heavily on each other and the specific approach we take matters.
+For instance, almost every student who has taken a quantum mechanics class has covered the quantum harmonic oscillator, but we use it to introduce tools and concepts that will be useful later.
 
-\section{Quantum devices}
-The goal of a quantum information experimentalist is to create or operate real physical hardware that harnesses quantum mechanics to perform sensing, computation, communication, or simulation. It turns out that superconducting devices are generally best suited for computation and simulation, and so we will focus on these areas. We will typically begin by discussing a topic in the context of gate-based quantum computing, where algorithms are run via sequences of nominally-discrete operations. However, we will show that the same techniques can also be used for continuous simulation, and will discuss them side by side.
+\leveldown{Format of the book}
 
-It is worth backing up to ask: what makes a good quantum computing device? First, we need the device to be \textit{coherent}: when we put it in a quantum state, we want the time evolution of that state to be predictable and repeatable. In practice this means making a physical system that is well isolated from coupling to any noise sources in its environment. Next, we need the device to be \textit{addressable}: we need to be able to initialize a quantum state, manipulate it, and read it out. In practice this means coupling the physical system to some degree of freedom (often the electromagnetic field) that we can control with ordinary electronics. Generally, the stronger the coupling, the easier the control.
+This book is being written and maintained as an open-source project.
+Our motivation for this is twofold.
+First, by allowing vetted community contributions to the text, we can ensure that we have expert writers covering the wide range of topics necessary.
+Second, the field of superconducting quantum information is developing quickly, and what is best practice or settled knowledge now may be outdated soon.
+We aim for this book to be a living document, updated and maintained continually as new discoveries are made in the field.
+The version control and community contribution model of open-source software is ideal for such a project, and so we adopt it.
+The book source lives at \href{https://github.com/superconducting-device-design}{github.com/superconducting-device-design/book}.
+Contributors can fork the repository, edit the source, then submit a pull request.
+See the repository documentation for details.
+To engage with this book as a traditional textbook, download the PDF at ??.
 
-Here we already see a contradiction! We want a system that is well isolated from its environment, yet couples strongly to our control and measurement apparatus. Noise is omnipresent, and so if we can ``talk'' to our system, so can its environment. There are different approaches to this problem. One is to start with a very coherent system, such as neutral atoms or trapped ions, then use clever control and strong driving to try to get more addressability. Another is to start with a very addressable system, such as electrons trapped in semiconductor quantum dots, then systematically try to remove or suppress environmental noise sources so there is nothing else for the quantum system to interact with. 
+\levelstay{Quantum devices}
 
-Superconducting quantum circuits take a compromise approach. We design these circuits so that they permit very strong coupling, typically in the form of a large high-frequency electric or magnetic dipole moment. However, we (ideally) make them couple \textit{only} to this degree of freedom, so the only environmental noise sources we need to worry about are those that also couple the exact same way. Then we engineer the environment to suppress any noisy couplings to the circuit. 
+The goal of a quantum information experimentalist is to create or operate real physical hardware that harnesses quantum mechanics to perform sensing, computation, communication, or simulation.
+It turns out that superconducting devices are generally best suited for computation and simulation, and so we will focus on these areas.
+We will typically begin by discussing a topic in the context of gate-based quantum computing, where algorithms are run via sequences of nominally-discrete operations.
+However, we will show that the same techniques can also be used for continuous simulation, and will discuss them side by side.
 
-We should note that the above statements are gross generalizations. There are superconducting circuits which are designed to be incredibly insensitive to their environments, often at the expense of more difficult control and readout. There are superconducting circuits that are extremely controllable via multiple coupling channels, allowing fast control but reducing coherence. We cannot possibly cover everything, so we will make generalizations, and will caveat them appropriately.
+What makes a good quantum computing device?
+First, we need the device to be \textit{coherent}: when we put it in a quantum state, we want the time evolution of that state to be predictable and repeatable.
+In practice this means making a physical system that is well isolated from coupling to any noise sources in its environment.
+Next, we need the device to be \textit{addressable}: we need to be able to initialize a quantum state, manipulate it, and read it out.
+In practice this means coupling the physical system to some degree of freedom (often the electromagnetic field) that we can control with ordinary electronics.
+Generally, the stronger the coupling, the easier the control.
 
-There is one other requirement for a good quantum technology: it must be \textit{scalable}. Quantum algorithms were performed decades ago with a handful of atoms, but these systems could not scale to larger sizes. We need to be able to reliably create processors with tens of thousands, millions, perhaps even billions of coherent, addressable quantum systems. As the field of superconducting devices matures, the challenges of scaling become more and more relevant, and we will address them later in the book.
+Here we already see a contradiction! We want a system that is well isolated from its environment, yet couples strongly to our control and measurement apparatus.
+Noise is omnipresent, and so if we can ``talk'' to our system, so can its environment.
+There are different approaches to this problem.
+One is to start with a very coherent system, such as neutral atoms or trapped ions, then use clever control and strong driving to try to get more addressability.
+Another is to start with a very addressable system, such as electrons trapped in semiconductor quantum dots, then systematically try to remove or suppress environmental noise sources so there is nothing else for the quantum system to interact with.
 
-\section{A target device}
+Superconducting quantum circuits take a compromise approach.
+We design these circuits so that they permit very strong coupling, typically in the form of a large high-frequency electric or magnetic dipole moment.
+However, we (ideally) make them couple \textit{only} to this degree of freedom, so the only environmental noise sources we need to worry about are those that also couple the exact same way.
+Then we engineer the environment to suppress any noisy couplings to the circuit.
+
+We should note that the above statements are gross generalizations.
+There are superconducting circuits which are designed to be incredibly insensitive to their environments, often at the expense of more difficult control and readout.
+There are superconducting circuits that are extremely controllable via multiple coupling channels, allowing fast control but reducing coherence.
+We cannot possibly cover everything, so we will make generalizations, and will caveat them appropriately.
+
+There is one other requirement for a good quantum technology: it must be \textit{scalable}.
+Quantum algorithms were performed decades ago with a handful of atoms, but these systems could not scale to larger sizes.
+We need to be able to reliably create processors with tens of thousands, millions, perhaps even billions of coherent, addressable quantum systems.
+As the field of superconducting devices matures, the challenges of scaling become more and more relevant, and we will address them later in the book.
+
+\levelstay{A target device}
+
 Let us end the beginning by posing a simple challenge to the reader: design the physical layout of a 2-transmon device that supports single-qubit gates with 99.9\% fidelity, two-qubit gates with 99\% fidelity, and readout with 99\% fidelity. These numbers are far from state-of-the-art\footnote{Although just a few years ago they would have been brag-worthy!}, so it should be easy, right? Throughout the book we will return to this simple challenge as we step through the many topics that are required in order to achieve it.
 
-We pose this target right at the beginning for a reason. We are about to go through several chapters before we even get to a quantum treatment of a circuit, let alone a real superconducting qubit. At every stage we will show that the topic we are covering is essential in order to achieve our end goal.
-
+We pose this target right at the beginning for a reason.
+We are about to go through several chapters before we even get to a quantum treatment of a circuit, let alone a real superconducting qubit.
+At every stage we will show that the topic we are covering is essential in order to achieve our end goal.
 
