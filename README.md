@@ -26,7 +26,7 @@ Reporting bugs or requesting new content, by posting an issue, is also a welcome
 
 ## Getting help
 
-1. For general help with Git, GitHub, LaTeX, or any other tool related to this repository, consult online resources (Stack Overflow, tutorials, blogs) and ask your friends, colleagues, clasmates, etc.
-Users in the [quantum-device-design Discord]().
+1. For general help with Git, GitHub, LaTeX, or any other tool related to this repository, consult online resources (Stack Overflow, tutorials, blogs) and ask your friends, colleagues, clasmates, etc. You can also ask for help on the [contributors' Discord channel](https://discord.com/channels/1375540266018148412/1516863253052133386).
 
-1. Questions regarding this repository, including editorial procedures, file organization, intended content, peculiarities in how we use Git or LaTeX, etc., should be posted as an issue on this repository.
+
+1. Questions regarding this repository, including editorial procedures, file organization, intended content, peculiarities in how we use Git or LaTeX, etc., should be posted as an issue on this repository. Higher bandwidth discussion needed to work through issues can be found in the Discord.
