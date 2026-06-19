@@ -1,0 +1,168 @@
+\levelstay{Driving} \label{sec:driving}
+
+\leveldown{Capacitive driving}
+
+We next consider an applied drive signal.
+We attach a driving voltage source to our parallel LC through a capacitor $C_d$, as shown by the dotted elements in Fig.\,\ref{Fig:singleCircuit}.
+The capacitor $C_d$ is required to prevent the driving circuit from completely ruining the coherence of the main circuit.
+Without the capacitor, the loaded quality factor of the resonator due to the drive circuit, denoted $Q_d$ would be $Q_d = R_d / Z_{LC}$ \citeinternalref{loadedMode}.
+With typical circuit impedances in the range 10's to 100's of Ohms, and RF source resistances of $50\,\Omega$\,\footnote{Commercial RF devices essentially \emph{all} use 50 \, $\Omega$ output impedance. This is simply due to the fact that a coaxial transmission line of reasonable size has near $50 \, \Omega$ impedance. The impedance depends logarithmically on geometric parameters and so cannot be significantly varied. 50$ \, \Omega$ has been chosen as a common standard.}, we have $Q_d \approx 1$ which is far too low to be useful in a quantum device.\footnote{The energy relaxation time of the circuit is $T_1 = Q_d / \omega$, so for a 1 GHz device $Q_d=1$ corresponds to $T_1=0.16 \, \text{ns}$.}
+
+The coupling capacitor $C_d$ helps preserve the circuit coherence.
+If $C_d$ is sufficiently small, its impedance $Z_{C_d} = 1/i\omega C_d$ is large and the current flowing through $R_d$ is reduced.
+Therefore, $C_d$ prevents the process by which energy from the oscillator gets into $R_d$ and is lost.
+To be specific, in the limit $Z_{C_d} \gg R_d$ the loaded quality factor of the oscillator is \citeinternalref{loadedMode}
+\begin{equation}
+  Q_d = \left( \frac{C}{C_d} \right)^2 \frac{Z_{LC}}{R_d} .
+\end{equation}
+Therefore, a small $C_d$ preserves the circuit's coherence.
+However, decoupling the drive line from the driving voltage source with a small $C_d$ also limits the speed with which we can control the circuit, so a balance must be struck.
+This balance is discussed in full quantitative detail later.
+
+Let's now turn back to formal analysis of the driven circuit, starting with a qualitative prediction.
+The main capacitor $C$ is shunted by the series combination of the coupling capacitor $C_d$, and the resistor $R_d$.
+Because  $Z_{C_d} \gg R_d$ the impedance of the driving circuit is dominated by $C_d$ which simply adds in parallel with $C$.
+Therefore, we expect the effective capacitance of the mode to be $C+C_d$.
+
+Denoting the time dependent driving voltage by $V_d(t)$ and ignoring for now the resistance of the source, we work out Kirchhoff's equation of motion for the driven system, resulting in
+\begin{equation}
+\frac{1}{1+C/C_d} \dot{V}_d = \ddot{\Phi} + \frac{\omega_0^2}{1 + C_d/C} \Phi. \end{equation}
+This is totally sensible: the drive strength increases as $C_d$ increases, and the resonance frequency of the LC mode has shifted due to the new capacitance.
+This equation of motion is produced by the Lagrangian
+\begin{equation}
+\mathcal{L} = \frac{1}{2}C \dot{\Phi}^2 - \frac{1}{2L}\Phi^2 + \frac{1}{2} C_d \left( \dot{\Phi} - V_d \right)^2 \, .
+\end{equation}
+For the sake of identifying canonical coordinates we consider the case $V_d=0$, resulting in canonical variables
+\begin{equation*}
+  \Phi
+  \qquad \textrm{and} \qquad
+  \frac{\partial \mathcal{L}}{\partial \dot{\Phi}} = \left( C + C_d \right) \dot{\Phi} \equiv Q
+\end{equation*}
+just as before, except that now the capacitance associated to the momentum $Q$ is $C+C_d$ instead of just $C$, which makes sense because $C_d$ is in parallel with $C$.
+The Hamiltonian is
+\begin{equation*}
+  H = \frac{Q^2}{2 (C + C_d)} + \frac{\Phi^2}{2L} \, .
+\end{equation*}
+Now we consider what happens when the drive turns on.
+The term added to the Lagrangian by the drive is
+\begin{equation*}
+  \mathcal{L}_d = \frac{1}{2}C_d V_d(t)^2 - C_d \dot{\Phi} V_d(t) \, .
+\end{equation*}
+The first term is of no consequence as it does not involve the dynamical variables.
+The second term couples the drive to the momentum $Q$, resulting in a Hamiltonian term
+\begin{equation*}
+H_d
+  = C_d \dot{\Phi}V_d(t)
+  = \frac{1}{1+C/C_d} Q V_d(t) \, . \label{eq:sec:driving:H_dVsCircuitParams}
+\end{equation*}
+Now in the quantum mechanical case, suppose the drive is on resonance with one particular transition $\ket{n} \rightarrow \ket{n+1}$ and far off resonance from any other transition.
+In this case we can restrict the analysis to just the states involved in the driven transition.\footnote{The restriction to two levels whose transition is on resonance with the drive is properly justified in the rotating frame, discussed later.}
+Because the wave functions of a one-dimensional quantum Hamiltonian are real and because $Q = -i \hbar d/d\Phi$, we can write
+\begin{equation*}
+  \bbraket{n}{Q}{n+1} = -i \abs{\bbraket{n}{Q}{n+1}} \, ,
+\end{equation*}
+which lets us write $H_d$ as
+\begin{align*}
+  H_d
+  &= \frac{V_d(t)}{1 + C / C_d}
+    \left[ \begin{array}{cc}
+      \bbraket{n}{Q}{n} & \bbraket{n}{Q}{n+1} \\
+      \bbraket{n+1}{Q}{n} & \bbraket{n+1}{Q}{n+1}
+    \end{array}\right] \\
+  &= \frac{V_d(t)}{1 + C / C_d} \left(
+      \frac{\Sigma_Q}{2} \mathbb{I}
+    + \frac{\Delta_Q}{2} \sigma_z
+    + \abs{\bbraket{n}{Q}{n+1}} \sigma_y
+  \right)
+\end{align*}
+where $\Sigma_Q \equiv \bbraket{n}{Q}{n} + \bbraket{n+1}{Q}{n+1}$ and $\Delta_Q \equiv \bbraket{n}{Q}{n} - \bbraket{n+1}{Q}{n+1}$.
+The identity term can be ignored, and the $\sigma_z$ term is negligible when $\Delta_Q$ is small or when $V_d(t)$ is a high frequency drive near the resonance frequency of the resonator.\footnote{We're not justifying this here, but we will in the section on the rotating frame.}
+With only the $\sigma_y$ term remaining, we have
+\begin{equation}
+  H_d = \frac{V_d(t)}{1 + C/C_d} \abs{Q_{n,n+1}} \, \sigma_y \, .
+\end{equation}
+
+In the limit that the matrix elements are harmonic we can rewrite $Q$ as
+\begin{equation*}
+  Q = -i Q_\text{zpf} (a - a^\dagger)
+\end{equation*}
+and if the system is approximately harmonic, then $\bbraket{n}{Q}{n} \approx 0$, $\bbraket{n+1}{Q}{n+1} \approx 0$, and $\bbraket{n}{Q}{n+1} \approx Q_\text{zpf} \sqrt{n+1}$, so
+\begin{equation*}
+  H_d = \frac{V_d(t)}{1 + C / C_d} \sqrt{n+1} \, Q_\text{zpf} \, \sigma_y
+  \, .
+\end{equation*}
+Later, we will express this driving Hamiltonian in the rotating frame of the resonator.
+However, we can already see one important point: the coupling of the drive signal to the circuit scales with the zero point fluctuations in the circuit's charge, and therefore inversely with $\sqrt{Z_{LC}}$.
+In other words, low impedance would appear to give stronger coupling.
+However, one must be careful about what is being held constant.
+Assuming fixed $\omega_{LC}$ and $C \gg C_d$, we find that the drive Hamiltonian is proportional to
+\begin{equation*}
+  \omega_{LC} \sqrt{Z_{LC}}
+\end{equation*}
+which increases for \emph{increasing} impedance.
+These same arguments apply to resonator-resonator coupling, as will be described below.
+
+\textbf{Summary - Simple derivation:} The energy stored in the drive capacitor is $E_d = \frac{1}{2}C_d\left( V_d - V_q \right)^2$.
+Keeping only the terms involving both the resonator and drive voltages yields
+\begin{equation*}
+  E_d = - C_d V_d V_q = - V_d \frac{C_d}{C} Q
+\end{equation*}
+where $Q$ is the resonator charge.
+This matches the full result up to the sign, in the practical limit $C \gg C_d$.
+
+
+\levelstay{Inductive driving}
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=5cm]{inductive_drive.pdf}
+\par\end{centering}
+  \caption{Parallel LC driving through a mutual inductance.}
+\label{fig:qubits.inductive_drive}
+\end{figure}
+
+We now consider the case in which we drive by applying current into an inductor which is coupled to the resonator's inductor through a mutual inductance $M_d$, as shown in Figure \ref{fig:qubits.inductive_drive}.
+With a drive current $I_d(t)$ Kirchhoff's law for the circuit yields the equation of motion
+\begin{equation}
+  \ddot{\Phi} + \omega_{LC}^2 \Phi = I_d \, \omega_{LC}^2 M_d \, .
+\end{equation}
+This equation is reproduced by the Lagrangian
+\begin{equation}
+  \mathcal{L} = \frac{1}{2}C \dot{\Phi}^2 - \frac{1}{2L} \Phi^2 + \frac{M_d}{L}I_d(t) \Phi \, .
+\end{equation}
+The momentum conjugate to $\Phi$ is
+\begin{equation*}
+  \frac{\partial \mathcal{L}}{\partial \dot{\Phi}} = C \dot{\Phi} = Q \, .
+\end{equation*}
+The full Hamiltonian is
+\begin{equation*}
+  H
+  = Q \dot{\Phi} - \mathcal{L}
+  = \frac{Q^2}{2C} + \frac{\Phi^2}{2L} - \frac{M_d}{L} I_d(t) \Phi
+\end{equation*}
+so the driving Hamiltonian is\footnote{Note that adding a Josephson junction in parallel with the circuit would \emph{not} change the form of $H_d$; the junction adds a term $(I_c \Phi_0 / 2\pi)\cos(\pi \Phi / \Phi_0)$ to the Lagrangian, but this term does not couple to $I_d$.}
+\begin{equation*}
+  H_d = - \frac{M_d}{L}I_d(t) \Phi \, .
+\end{equation*}
+Just as we did for the capacitive drive, we can express the restriction of the inductive drive Hamiltonian to a two-level subspace as
+\begin{equation*}
+  H_d = -\frac{M_d}{L} I_d(t) \left(
+      \frac{\Sigma_\Phi}{2} \mathbb{I}
+    + \frac{\Delta_\Phi}{2} \sigma_z
+    + \abs{\bbraket{n}{\Phi}{n+1}} \sigma_x
+  \right)
+\end{equation*}
+where $\Sigma_\Phi = \bbraket{n}{\Phi}{n} + \bbraket{n+1}{\Phi}{n+1}$ and $\Delta_\Phi = \bbraket{n}{\Phi}{n} - \bbraket{n+1}{\Phi}{n+1}$.
+The identity term can be ignored, and under the same assumptions described in the capacitive case the $\sigma_z$ term can also be ignored, leaving
+\begin{equation}
+  H_d = - \frac{M_d}{L} I_d(t) \abs{\Phi_{n,n+1}} \, \sigma_x \, .
+\end{equation}
+When the matrix element is nearly harmonic, we write $\Phi$ in terms of raising and lowering operators
+\begin{equation*}
+  \Phi = \Phi_\text{zpf} (a + a^\dagger)
+\end{equation*}
+to find
+\begin{equation*}
+  H_d = - \frac{M_d}{L} I_d(t) \sqrt{n+1} \, \Phi_\text{zpf} \, \sigma_x
+  \, .
+\end{equation*}

@@ -1,0 +1,12 @@
+texbuild-out/
+*.pdf
+*.pyc
+*.toc
+*.aux
+*.out
+*.log
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
