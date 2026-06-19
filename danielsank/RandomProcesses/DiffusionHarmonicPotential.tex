@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{esint}
+
+\title{Random Diffusion in a Harmonic Potential}
+\author{Daniel Sank \\ \small{University of California, Santa Barbara}}
+\date{8 December 2009}
+
+\begin{document}
+
+\maketitle
+
+\section{Statement of the Problem}
+
+Newton's equation of motion for a particle in a viscous medium subject
+to random driving is\[
+m\ddot{x}=-kx-2m\gamma\dot{x}+m\xi(t)\]
+where $m\xi(t)$ is the random driving force and $m\gamma$ is the
+friction coefficient. We would like to study the stochastic properties
+of this system, for example the probability distribution for the position
+$x$ and perhaps it's correlation function.
+
+
+\section{Solution by Fourier Transform}
+
+Rearranging we have\[
+\ddot{x}+2\gamma\dot{x}+\omega_{0}^{2}x=\xi(t)\]
+We define Fourier transforms\begin{eqnarray*}
+x(t) & = & \int\frac{d\omega}{2\pi}\tilde{x}(\omega)e^{i\omega t}\\
+\tilde{x}(\omega) & = & \int dt\, x(t)e^{-i\omega t}\end{eqnarray*}
+Then transforming the equation of motion gives\[
+(-\omega^{2}+2i\gamma\omega+\omega_{0}^{2})\tilde{x}=\tilde{\xi}(\omega)\]
+\[
+\tilde{x}(\omega)=\frac{-\tilde{\xi}(\omega)}{\omega^{2}-2i\gamma\omega-\omega_{0}^{2}}\]
+To find the correllation function of $x$ we can use the Weiner-Kintchein
+relation\[
+\int e^{i\Omega\tau}S_{p}(\Omega)\frac{d\Omega}{2\pi}=\int dt\, f(t)f(t+\tau)\]
+where $S_{p}$ is the Physicist's power spectrum, $S_{p}(\omega)=|\tilde{x}(\omega)|^{2}$.
+We are therefore lead to calculate $|\tilde{x}(\omega)|^{2}$,\begin{eqnarray*}
+|\tilde{x}(\omega)|^{2} & = & \frac{|\tilde{\xi}(\omega)|^{2}}{(\omega^{2}-\omega_{0}^{2})^{2}+(2\gamma\omega)^{2}}\\
+\int dt\, x(t)x(t+\tau) & = & \int\frac{d\omega}{2\pi}\frac{|\tilde{\xi}(\omega)|^{2}\, e^{i\omega\tau}}{(\omega^{2}-\omega_{0}^{2})^{2}+(2\gamma\omega)^{2}}\end{eqnarray*}
+
+\end{document}

@@ -1,0 +1,102 @@
+\makeatletter
+\newcommand*{\declarecommand}{%
+  \@star@or@long\declare@command
+}
+\newcommand*{\declare@command}[1]{%
+  \provide@command{#1}{}%
+  % \let#1\@empty % would be more efficient, but without error checking
+  \renew@command{#1}%
+}
+\makeatother
+
+% Book-specific
+
+\declarecommand{\newword}[1]{\textbf{#1}}
+
+% General physics constructs
+\declarecommand{\bra}[1]{\langle #1 |}
+\declarecommand{\ket}[1]{| #1 \rangle }
+\declarecommand{\braket}[2]{\langle #1|#2\rangle}
+\declarecommand{\bbraket}[3]{ \langle #1 | #2 | #3 \rangle }
+\declarecommand{\boltzmann}{k_b}
+
+% Common math
+\declarecommand{\norm}[1]{\left \lvert #1 \right \rvert}
+\declarecommand{\abs}[1]{\left \lvert #1 \right \rvert}  % These two are redundant. Consider removing one.
+
+\declarecommand{\avg}[1]{\left \langle #1 \right \rangle}  % Should get rid of this, as "average" isn't specific.
+\declarecommand{\angavg}[1]{\left \langle #1 \right \rangle}
+
+\declarecommand{\VS}{\textit{\textbf{V}}}
+\declarecommand{\Tr}{\textrm{Tr}}
+\declarecommand{\Re}{\textrm{Re}}
+\declarecommand{\Im}{\textrm{Im}}
+\declarecommand{\basis}[1]{\{\ket{#1}\}}
+\declarecommand{\reals}{\mathbb{R}}
+\declarecommand{\complexes}{\mathbb{C}}
+\declarecommand{\integers}{\mathbb{Z}}
+
+% Quantum
+\declarecommand{\nboseeinstein}{n_\text{BE}}
+\declarecommand{\gammaup}{\Gamma_\uparrow}
+\declarecommand{\gammadown}{\Gamma_\downarrow}
+\declarecommand{\gammaupdown}{\Gamma_{\uparrow \downarrow}}
+\declarecommand{\gammaemission}{\Gamma_\text{loss}}
+\declarecommand{\qualityfactoremission}{Q_{d,\text{loss}}}
+
+% Qubits
+\declarecommand{\omegaqubit}{\omega_{10}}
+
+% Circuits
+\declarecommand{\impedance}{Z_0}
+\declarecommand{\resistorsource}{R_s}
+\declarecommand{\vsource}{V_s}
+\declarecommand{\vsourcerms}{V_{s,\text{rms}}}
+\declarecommand{\vloadrms}{V_{l,\text{rms}}}
+
+% Signals and noise
+\declarecommand{\ft}[1]{\tilde #1}
+
+\declarecommand{\psdsingle}{S_\text{ss}}
+\declarecommand{\psddouble}{S_\text{ds}}
+\declarecommand{\noiseavailable}{S_{p,a}^e}
+\declarecommand{\spectralengineer}{S^e}
+\declarecommand{\spectralsymmetric}{S^\text{symm}}
+\declarecommand{\spectralattenuator}{\spectralengineer_{\poweravailable, \text{att.}}}
+
+% Microwaves
+\declarecommand{\vright}{V_+}
+\declarecommand{\vleft}{V_-}
+\declarecommand{\iright}{I_+}
+\declarecommand{\ileft}{I_-}
+\declarecommand{\poweravailable}{P_a}
+
+% Figures. Example usage:
+% \quickfig{\columnwidth}{my_image}{This is the caption}{fig:my_fig}
+\DeclareRobustCommand{\quickfig}[4]{
+\begin{figure}
+\begin{centering}
+\includegraphics[width=#1]{#2}
+\par\end{centering}
+\caption{#3}
+\label{#4}
+\end{figure}
+}
+
+\DeclareRobustCommand{\quickwidefig}[4]{
+\begin{figure*}[h]
+\begin{centering}
+\includegraphics[width=#1]{#2}
+\par\end{centering}
+\caption{#3}
+\label{#4}
+\end{figure*}
+}
+
+\DeclareRobustCommand{\quickfigcentered}[4]{
+  \begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=#1]{#2}}
+  \caption{#3}
+  \label{#4}
+  \end{figure}
+}

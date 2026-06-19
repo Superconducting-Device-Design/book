@@ -1,0 +1,26 @@
+\documentclass{book}
+\author{Daniel Sank}
+\title{Elements of Quantum Engineering}
+\date{17 July 2022}
+
+\input{macros.tex}
+\input{packages.tex}
+
+\newcommand{\citeinternaltype}{chapter}
+\newcommand{\citeinternalref}{\ref}
+\newcommand{\diffusionconst}{D}
+
+\newcommand{\widewidth}{1}
+
+\geometry{letterpaper, left=20mm}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{content.tex}
+
+\bibliographystyle{unsrt}
+\bibliography{./references.bib}
+
+\end{document}
